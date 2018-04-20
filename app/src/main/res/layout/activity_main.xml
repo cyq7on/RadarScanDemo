@@ -12,4 +12,24 @@
         android:layout_height="600px"
         android:layout_centerInParent="true" />
 
+    <Button
+        android:id="@+id/add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:text="添加"
+        android:onClick="onClick"
+        android:layout_alignParentTop="true" />
+
+    <Button
+        android:id="@+id/clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/add"
+        android:onClick="onClick"
+        android:text="清除" />
+
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
@@ -36,6 +37,7 @@ public class RadarView extends View {
     int mOutWidth;// 外圆宽度(w/4/5*2=w/10)
     int mCx, mCy;// x、y轴中心点
     int mOutsideRadius, mInsideRadius;// 外、内圆半径
+    private boolean isClear = false;
 
     public RadarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -53,6 +55,10 @@ public class RadarView extends View {
         super(context);
         // TODO Auto-generated constructor stub
         init(context);
+    }
+
+    public static void addPoint(double x,double y) {
+
     }
 
     /**
@@ -106,6 +112,16 @@ public class RadarView extends View {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
+        if(isClear){
+//            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+            /*Paint paint = new Paint();
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawPaint(paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));*/
+            canvas.drawColor(Color.TRANSPARENT);
+            isClear = false;
+            return;
+        }
         // 开始绘制最外层的圆
         mPaint.setAntiAlias(true);// 设置抗锯齿
         mPaint.setStyle(Style.FILL);// 设置填充样式
@@ -217,6 +233,11 @@ public class RadarView extends View {
     public void addPoint() {
         mPointCount++;
         this.invalidate();
+    }
+
+    public void clear() {
+        isClear = true;
+        invalidate();
     }
 
     /**
