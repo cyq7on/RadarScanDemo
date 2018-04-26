@@ -8,18 +8,22 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.View;
 
+import com.zihao.radar.LogUtil;
 import com.zihao.radar.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
 /**
  * TODO<雷达扫描视图>
- * @author  zihao 2015年11月11日 上午12:26:11
+ *
+ * @author zihao 2015年11月11日 上午12:26:11
  */
 public class RadarView extends View {
 
@@ -38,6 +42,8 @@ public class RadarView extends View {
     int mCx, mCy;// x、y轴中心点
     int mOutsideRadius, mInsideRadius;// 外、内圆半径
     private boolean isClear = false;
+    private float maxDinstance;
+    private Map<String, Double> lastLocaiton;
 
     public RadarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -57,8 +63,12 @@ public class RadarView extends View {
         init(context);
     }
 
-    public static void addPoint(double x,double y) {
+    public float getMaxDinstance() {
+        return maxDinstance;
+    }
 
+    public void setMaxDinstance(float maxDinstance) {
+        this.maxDinstance = maxDinstance;
     }
 
     /**
@@ -112,7 +122,7 @@ public class RadarView extends View {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
-        if(isClear){
+        if (isClear) {
 //            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
             /*Paint paint = new Paint();
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -191,7 +201,7 @@ public class RadarView extends View {
         // 4.开始绘制动态点
         canvas.restore();// 用来恢复Canvas之前保存的状态.防止save后对Canvas执行的操作对后续的绘制有影响.
 
-        if (mPointCount > 0) {// 当圆点总数>0时,进入下一层判断
+        /*if (mPointCount > 0) {// 当圆点总数>0时,进入下一层判断
 
             if (mPointCount > mPointArray.size()) {// 当圆点总数大于存储坐标点数目时,说明有增加,需要重新生成随机坐标点
                 int mx = mInsideRadius + mRandom.nextInt(mInsideRadius * 6);
@@ -213,6 +223,16 @@ public class RadarView extends View {
                             Integer.parseInt(result[0]),
                             Integer.parseInt(result[1]), null);
             }
+        }*/
+
+        // 开始绘制坐标点
+        for (int i = 0; i < mPointArray.size(); i++) {
+            String[] result = mPointArray.get(i).split("/");
+
+            canvas.drawBitmap(mDefaultPointBmp,
+                    Float.parseFloat(result[0]),
+                    Float.parseFloat(result[1]), null);
+
         }
 
         if (isSearching)
@@ -233,6 +253,26 @@ public class RadarView extends View {
     public void addPoint() {
         mPointCount++;
         this.invalidate();
+    }
+
+    public void addPoint(List<Pair<Float, Float>> list, Map<String, Double> location) {
+        LogUtil.d("mInsideRadius:" + mInsideRadius);
+        if (mPointArray.size() > 0) {
+            mPointArray.clear();
+
+        }
+        double x, y;
+        if (lastLocaiton == null) {
+            x = 0;
+            y = 0;
+        } else {
+            x = location.get("x") - lastLocaiton.get("x");
+            y = location.get("x") - lastLocaiton.get("y");
+        }
+        for (Pair<Float, Float> pair : list) {
+            mPointArray.add((pair.first - x) * mInsideRadius / maxDinstance + "/" + (pair.second - y) * mInsideRadius / maxDinstance);
+        }
+        invalidate();
     }
 
     public void clear() {
